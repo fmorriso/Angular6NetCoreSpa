@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Angular6NetCoreSpa.Filters
+namespace Angular6NetCoreSpa.CustomExceptions
 {
 	public class CustomExceptionExample : Exception
 	{

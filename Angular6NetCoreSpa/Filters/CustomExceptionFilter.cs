@@ -5,13 +5,15 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 //
+using Angular6NetCoreSpa.CustomExceptions;
 using LoggerService;
-using Microsoft.Extensions.Configuration;
+using NLog;
+using NLog.Extensions.Logging;
 
 namespace Angular6NetCoreSpa.Filters
 {
-	// http://www.talkingdotnet.com/global-exception-handling-in-aspnet-core-webapi/
-	public class CustomExceptionFilter : ExceptionFilterAttribute//IExceptionFilter
+	// http://www.talkingdotnet.com/global-exception-handling-in-aspnet-core-webapi/ with some changes for 2.1
+	public class CustomExceptionFilter : ExceptionFilterAttribute
 	{
 		private readonly ILoggerManager _logger;
 		public CustomExceptionFilter(ILoggerManager logger)
@@ -27,6 +29,8 @@ namespace Angular6NetCoreSpa.Filters
 
 		public override void OnException(ExceptionContext context)
 		{
+			//WARNING: since OnExceptionAsync automatically calls OnException, we have to protect ourselves from a serious
+			// error that will occur if we try to respond more than once.
 			if (!context.ExceptionHandled)
 				CommonLogic(context);
 
@@ -59,11 +63,12 @@ namespace Angular6NetCoreSpa.Filters
 				message = context.Exception.Message;
 				status = HttpStatusCode.NotFound;
 			}
-
-			if (_logger is NLog.Logger)
+			// https://github.com/nlog/nlog/wiki/Tutorial
+			if (_logger is LoggerService.LoggerManager)
 			{
-				NLog.Logger logger = (NLog.Logger)_logger;
+				NLog.Logger logger = NLog.LogManager.GetLogger("Logger");
 				logger.Error(context);
+				logger.Log(LogLevel.Error, context.Exception.StackTrace);
 			}
 
 			context.ExceptionHandled = true; // <--- *** EXTREMELY IMPORTANT ***
