@@ -23,8 +23,8 @@ using NLog.Extensions.Logging;
 
 namespace Angular6NetCoreSpa
 {
-    public class Startup
-    {
+	public class Startup
+	{
 		// https://github.com/CodeMazeBlog/.NET-Core-Series/blob/master/Part%203/AccountOwnerServer/Startup.cs
 		public Startup(IConfiguration configuration, ILoggerFactory loggerFactory) // <-- NLog addition
 		{
@@ -33,45 +33,43 @@ namespace Angular6NetCoreSpa
 			//OBSOLETE: loggerFactory.ConfigureNLog(nlogConfigPath);
 			LogManager.LoadConfiguration(nLogConfigFile);
 			Configuration = configuration;
-        }
+		}
 
-        public IConfiguration Configuration { get; }
+		public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc(
-	            config =>
-	            {
-		            config.Filters.Add(typeof(CustomExceptionFilter));
-	            }
-            ).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-
+		// This method gets called by the runtime. Use this method to add services to the container.
+		public void ConfigureServices(IServiceCollection services)
+		{
 			//OBSOLETE: services.ConfigureLoggerService();
+			//services.AddSingleton<NLogLoggerFactory, N>()
 			services.AddSingleton<ILoggerManager, LoggerManager>(); // <-- NLog addition
 
 			// custom error handler
-	        services.AddMvc(
-		        config => {
-			        config.Filters.Add(typeof(CustomExceptionFilter));
-		        }
-	        );
+			services.AddMvc(
+				config =>
+				{
+					config.Filters.Add(typeof(CustomExceptionFilter));
+				}
+			);
+
+			services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
 		}
 
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env) // TODO: inject NLog DI here
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-            else
-            {
-                app.UseHsts();
-            }
-			
+		{
+			if (env.IsDevelopment())
+			{
+				app.UseDeveloperExceptionPage();
+			}
+			else
+			{
+				app.UseHsts();
+			}
+
 			app.UseHttpsRedirection();
-            app.UseMvc();
-        }
-    }
+			app.UseMvc();
+		}
+	}
 }

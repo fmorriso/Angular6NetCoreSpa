@@ -46,12 +46,9 @@ namespace Angular6NetCoreSpa.Controllers
 #if RUN_DEFAULTS
             return "value";
 #else
-			string sMessage = "test";
-			if (sMessage.Length > 0)
-			{
-				throw new CustomExceptionExample("My Custom Exception");
-			}
-			return sMessage;
+			//throw new CustomExceptionExample("My Custom Exception");
+			throw new Exception("regular exception");
+			//return sMessage;
 #endif
 		}
 
