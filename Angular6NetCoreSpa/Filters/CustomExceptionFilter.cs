@@ -39,6 +39,12 @@ namespace Angular6NetCoreSpa.Filters
 
 		private void CommonLogic(ExceptionContext context)
 		{
+			// https://github.com/nlog/nlog/wiki/Tutorial
+			NLog.Logger logger = NLog.LogManager.GetLogger("Logger");
+			logger.Error(context);
+			if (!string.IsNullOrEmpty(context.Exception.StackTrace))
+				logger.Log(LogLevel.Error, context.Exception.StackTrace);
+
 			HttpStatusCode status = HttpStatusCode.InternalServerError;
 			String message = String.Empty;
 
@@ -62,13 +68,6 @@ namespace Angular6NetCoreSpa.Filters
 			{
 				message = context.Exception.Message;
 				status = HttpStatusCode.NotFound;
-			}
-			// https://github.com/nlog/nlog/wiki/Tutorial
-			if (_logger is LoggerService.LoggerManager)
-			{
-				NLog.Logger logger = NLog.LogManager.GetLogger("Logger");
-				logger.Error(context);
-				logger.Log(LogLevel.Error, context.Exception.StackTrace);
 			}
 
 			context.ExceptionHandled = true; // <--- *** EXTREMELY IMPORTANT ***
